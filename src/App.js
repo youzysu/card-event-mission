@@ -1,35 +1,33 @@
+import React from "react";
 import { useEffect, useState } from "react";
-import Cards from "./cards.js";
+import datas from '../src/data/cards'
+import BusinessCard from '../src/components/BusinessCard'
 
-function App() {
-  const [cardList, setCardList] = useState();
-  const [selectedCard, setSelectedCard] = useState();
-  const [selectList, setSelectList] = useState([]);
-  const selectCard = () => {
-    setSelectedCard(cardList[Math.floor(Math.random() * cardList.length)]);
-    setCardList(cardList.filter((card) => card.name !== selectedCard.name))
-    setSelectList((pre) => [selectedCard, ...pre])
+export default function App() {
+  const [cards, setCards] = useState([]);
+  const [pickedCards, setPickedCards] = useState([]);
+  function draw() {
+    if (pickedCards.length > 2) {
+      const names = pickedCards.reduce((acc, cur) => {
+        return (acc = acc.concat(`${cur.name}, `));
+      }, "");
+      console.log(typeof names)
+      return alert (`당첨자는 ${names}입니다.`);
+    }
+    const randomIndex = Math.floor(Math.random() * cards.length);
+    const randomItem = cards[randomIndex]
+    setCards(cards.filter(c => c.phoneNumber !== randomItem.phoneNumber))
+    setPickedCards([...pickedCards, randomItem]);
   }
-  if (selectList.length === 3) {
-    window.alert(`이미 3명의 추첨을 완료했습니다. 당첨자는 ${selectList.map(({name}) => ([name]))}입니다.`);
-  };
 
   useEffect(() => {
-    setCardList(Cards);
-  }, [])
+    setCards(datas);
+  }, []);
 
   return (
     <div>
-      <button onClick={selectCard}>추첨하기</button>
-      { selectedCard === undefined ? "" : (
-        <div>
-          <h3>{selectedCard.name}</h3>
-          <h4>{selectedCard.company} {selectedCard.team}</h4>
-          <h4>{selectedCard.phoneNumber} {selectedCard.email}</h4>
-        </div>
-      )}
+      {cards.length > 0 && <button onClick={draw}>추첨하기</button>}
+      {pickedCards.length > 0 && <BusinessCard info={pickedCards[pickedCards.length - 1]}/>}
     </div>
-  );
+  )
 }
-
-export default App;
